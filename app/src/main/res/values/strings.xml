@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Smart\nNotification</string>
+    <string name="foreground_notification_title">SmartTitle</string>
+    <string name="foreground_notification_message">This app will collect notifications.</string>
+    <string name="ticker_text">ticker text</string>
+    <string name="alert_dialog_permission_title">Request the permission to listen to notification</string>
+    <string name="alert_dialog_permission_content">"This app is used for collect the information from .. app. "</string>
+    <string name="export_title">Export</string>
+    <string name="export_message">This will save the information to Android/data/com.roro.smarnotification/files/[date_time].txt.</string>
+
+    <string name="filter_title">Change Filter</string>
+    <string name="filter_message_turn_on">Turn on filter?</string>
+    <string name="filter_message_turn_off">Turn off filter?</string>
+
+    <string name="delete_btn_title">Delete</string>
+    <string name="delete_btn_content">Are you sure to delete this notification record? </string>
+    <string name="email_address">123@gmail.com</string>
+    <string name="email_subject">Notification Report</string>
+
+</resources>
