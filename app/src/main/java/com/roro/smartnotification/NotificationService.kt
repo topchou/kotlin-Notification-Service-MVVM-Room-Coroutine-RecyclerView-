@@ -56,7 +56,7 @@ class NotificationService : NotificationListenerService() {
 
     }
 
-    override fun onBind(intent: Intent?): IBinder {
+    override fun onBind(intent: Intent): IBinder? {
         Log.d(TAG, "NotificationService onBind")
         return super.onBind(intent)
     }
