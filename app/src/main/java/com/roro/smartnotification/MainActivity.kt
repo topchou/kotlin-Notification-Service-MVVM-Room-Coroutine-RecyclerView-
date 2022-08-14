@@ -32,16 +32,11 @@ import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
-
     private val TAG = "MainActivity"
-
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var notificationManager: NotificationManager
     private lateinit var viewModel: DbNotificationViewModel
-
     private lateinit var adapter: NotificationAdapter
-
     private var notifyID = 0
     private var file: File? = null
 
@@ -64,18 +59,10 @@ class MainActivity : AppCompatActivity() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         //Get the view model
-        //model = ViewModelProvider(this, SavedStateViewModelFactory(application, this)).get(
-        //    DbNotificationViewModel::class.java)
         viewModel = ViewModelProvider(this).get(DbNotificationViewModel::class.java)
-
 
         //Create observer which update UI
         adapter = NotificationAdapter()
-
-
-        // Set recyclerView adapter
-        //adapter = NotificationAdapter(mNotificationList)
-
 
         /*
          * Note: This doesn't work,so just change to below implement. Wonder know why.
@@ -88,15 +75,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.notificationList.adapter = adapter
         binding.notificationList.layoutManager = LinearLayoutManager(this)
-        /*
-        viewModel.notifications.observe(this,
-            Observer<List<DbNotification>> {
-                adapter.setListData(ArrayList(it))
-                adapter.notifyDataSetChanged()
-                Log.d(TAG, "onChanged notify")
-            })
-
-         */
 
         lifecycle.coroutineScope.launch {
             viewModel.notifications().collect {
@@ -105,8 +83,6 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
         }
-
-
 
         binding.createNotificationBtn.setOnClickListener {
             createTestNotification()

@@ -8,18 +8,6 @@ class DbNotificationViewModel(application: Application) :
     AndroidViewModel(application) {
     private var notificationDao: DbNotificationDao =
         DbNotificationDatabase.getInstance(getApplication())?.getRoomDao()
-    //var notifications: LiveData<List<DbNotification>>
-
-    /*
-    init {
-        //notifications = MutableLiveData()
-        //getAllNotifications()
-    }
-
-    private fun getAllNotifications() {
-        notifications =  notificationDao.all()
-    }
-     */
 
     fun notifications(): Flow<List<DbNotification>> {
         return notificationDao.all()

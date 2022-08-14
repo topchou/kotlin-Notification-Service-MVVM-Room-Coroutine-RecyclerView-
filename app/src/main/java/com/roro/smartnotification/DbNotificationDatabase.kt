@@ -11,29 +11,18 @@ abstract class DbNotificationDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: DbNotificationDatabase? = null
         fun getInstance(context: Context): DbNotificationDatabase {
-            synchronized(this) {
-                var instance = INSTANCE
-                if (instance == null) {
-                    instance =
-                        Room.databaseBuilder(context,
-                            DbNotificationDatabase::class.java,
-                            "notification_table").build()
-                }
-                return instance as DbNotificationDatabase
+            return INSTANCE ?: synchronized(this) {
+                val instance =
+                    Room.databaseBuilder(context,
+                        DbNotificationDatabase::class.java,
+                        "notification_table").build()
+                INSTANCE = instance
+
+                instance
             }
 
 
         }
-        /*
-        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
-            instance ?: buildDataBase(context).also { instance = it }
-        }
-
-        private fun buildDataBase(context: Context) = Room.databaseBuilder(context,
-            DbNotificationDatabase::class.java,
-            "notification_table").build()
-
-         */
     }
 
 

@@ -1,13 +1,8 @@
 package com.roro.smartnotification
 
-import android.app.ApplicationPackageManager
-import android.app.Notification
 import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import android.service.notification.StatusBarNotification
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +15,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-//class NotificationAdapter(private var list: List<DbNotification>) :
 class NotificationAdapter() :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val TAG = "NotificationViewHolder"
@@ -64,19 +58,6 @@ class NotificationAdapter() :
                     e.toString()
                 }
 
-                // Get Notification Info
-                /*
-                val sbn = list[position]
-                val notification = sbn.notification
-                val extras = notification.extras
-                val time = sbn.postTime
-                val packageName = sbn.packageName
-                val icon = packageManager.getApplicationIcon(packageName)
-                val title = extras.getString(Notification.EXTRA_TITLE)
-                val content = extras.getString(Notification.EXTRA_TEXT)
-
-                 */
-
                 icon?.let { holder.iconView.setImageDrawable(it) }
                 holder.packageNameView.text = packageName ?: "unknown package"
                 holder.titleView.text = title ?: "with no title"
@@ -90,7 +71,6 @@ class NotificationAdapter() :
                  */
 
             }
-
 
         }
         Log.d(TAG, "ViewHolder")
