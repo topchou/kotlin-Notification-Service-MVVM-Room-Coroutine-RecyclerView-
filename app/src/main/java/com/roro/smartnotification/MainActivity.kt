@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
         lifecycle.coroutineScope.launch {
             viewModel.notifications().collect {
-                Log.d(TAG, "Roro, kao")
+                Log.d(TAG, "Roro, notifications onChange")
                 adapter.setListData(it)
                 adapter.notifyDataSetChanged()
             }

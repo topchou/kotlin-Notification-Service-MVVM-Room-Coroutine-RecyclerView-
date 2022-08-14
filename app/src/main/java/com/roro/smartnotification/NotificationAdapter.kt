@@ -11,6 +11,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -64,11 +66,12 @@ class NotificationAdapter() :
                 holder.contentView.text = content ?: "with no content"
                 //holder.timeView.text = Utils.convertTimeFormat(time)
                 holder.timeView.text = time
-                /*
+
                 holder.delButton.setOnClickListener(View.OnClickListener {
-                    deleteCheck(position)
+                    Log.d(TAG, "Roro, notification id : ${notification.id}")
+                    deleteCheck(notification)
                 })
-                 */
+
 
             }
 
@@ -94,18 +97,22 @@ class NotificationAdapter() :
 
     }
 
-    private fun deleteCheck(position: Int) {
-        val enableNotificationListenerAlertDialog = buildDeleteAlertDialog(position)
+    private fun deleteCheck(dbNotification: DbNotification) {
+        val enableNotificationListenerAlertDialog = buildDeleteAlertDialog(dbNotification)
         enableNotificationListenerAlertDialog!!.setCanceledOnTouchOutside(false)
         enableNotificationListenerAlertDialog.show()
     }
 
-    private fun buildDeleteAlertDialog(position: Int): AlertDialog? {
+    private fun buildDeleteAlertDialog(dbNotification: DbNotification): AlertDialog? {
         val alertDialogBuilder = AlertDialog.Builder(context)
         alertDialogBuilder.setTitle(R.string.delete_btn_title)
         alertDialogBuilder.setMessage(R.string.delete_btn_content)
         alertDialogBuilder.setPositiveButton("Yes"
         ) { dialog, id -> //delete
+            val dao = DbNotificationDatabase.getInstance(context.applicationContext).getRoomDao()
+            GlobalScope.launch {
+                dao.delete(dbNotification)
+            }
             /*
             val post_time_as_ID: Long = list.get(position).getPostTime()
             val deleteNotification = Intent(context, NotificationService::class.java)
