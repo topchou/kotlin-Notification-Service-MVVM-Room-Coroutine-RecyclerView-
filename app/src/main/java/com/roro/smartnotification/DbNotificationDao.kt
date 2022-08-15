@@ -24,4 +24,7 @@ interface DbNotificationDao {
     @Query("SELECT * FROM notification_table ORDER BY id DESC")
     fun all(): Flow<List<DbNotification>>
 
+    @Query("DELETE FROM notification_table")
+    fun deleteAll()
+
 }

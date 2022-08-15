@@ -1,6 +1,5 @@
 package com.roro.smartnotification
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.*
@@ -8,8 +7,9 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
-import android.service.notification.StatusBarNotification
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationCompat
@@ -17,7 +17,6 @@ import androidx.core.content.FileProvider
 import com.roro.smartnotification.databinding.ActivityMainBinding
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import java.io.File
 import java.io.FileNotFoundException
@@ -25,9 +24,9 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.lifecycle.Observer
 import androidx.lifecycle.coroutineScope
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Hide ActionBar
-        supportActionBar?.hide()
+        //supportActionBar?.hide()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         //Start service for catching system Notifications in background
@@ -97,6 +96,23 @@ class MainActivity : AppCompatActivity() {
             share()
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.clearAll -> {
+                GlobalScope.launch {
+                    viewModel.clearAll()
+                }
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun share() {
@@ -212,51 +228,43 @@ class MainActivity : AppCompatActivity() {
         return alertDialogBuilder.create()
     }
 
-
     private fun exportToLocal() {
-        val saveData = Thread {
+        lifecycle.coroutineScope.launch {
+            Log.d(TAG, "Roro launch exportToLocal")
             val calendar = Calendar.getInstance()
             val dateFormat = SimpleDateFormat("MMdd_hhmmss")
             val docName = dateFormat.format(calendar.getTime()) + ".txt"
             file = File(getExternalFilesDir(null), docName)
-            Log.d(TAG, "getPath: ${file?.path},  getAbsolutePath: ${file?.absolutePath}")
-            var fos: FileOutputStream? = null
+            Log.d(TAG, "Roro getPath: ${file?.path},  getAbsolutePath: ${file?.absolutePath}")
+            var fos: FileOutputStream
             val split = "----------------------\n\n"
+            var list = viewModel.notifications().flattenToList()
+            Log.d(TAG, "Roro list size = ${list.size}")
             try {
                 fos = FileOutputStream(file)
-                /*
-                for (i in mNotificationList.indices) {
-                    val sbn = mNotificationList[i]
-                    val extras = sbn.notification.extras
-                    val packageName = sbn.packageName
-                    val app = packageName ?: "From unknown package"
-                    val title = extras.getString(Notification.EXTRA_TITLE)
-                    val content = extras.getString(Notification.EXTRA_TEXT)
-                    val time: String = Utils.convertTimeFormat(sbn.postTime)
-                    fos.write("APP: $app\n".toByteArray())
+
+                for (notification in list) {
+                    val packageName = notification.packageName
+                    val title = notification.title
+                    val content = notification.content
+                    val time = notification.time
+                    fos.write("APP packageName: $packageName\n".toByteArray())
                     fos.write("Received Time: $time\n".toByteArray())
                     fos.write("Title: $title\n".toByteArray())
                     fos.write("Content: $content\n".toByteArray())
                     fos.write(split.toByteArray())
                 }
-
-                 */
-                Toast.makeText(this@MainActivity, "finish save", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Roro finish save", Toast.LENGTH_SHORT).show()
             } catch (e: FileNotFoundException) {
-                Toast.makeText(this@MainActivity, "Save Fail", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Roro Save Fail", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
             } catch (e: IOException) {
-                Toast.makeText(this@MainActivity, "Save Fail", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Roro Save Fail", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
             }
         }
-        saveData.run()
-
-        /*
-        StorageManager sm = getSystemService(StorageManager.class);
-        StorageVolume volume = sm.getPrimaryStorageVolume();
-        Intent intent = volume.createOpenDocumentTreeIntent();
-        startActivityForResult(intent, REQUEST_PERMISSION_WRITE);
-         */
     }
+
+    private suspend fun <T> Flow<List<T>>.flattenToList() =
+        flatMapConcat { it.asFlow() }.toList()
 }

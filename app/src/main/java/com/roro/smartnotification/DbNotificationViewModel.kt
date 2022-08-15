@@ -13,6 +13,10 @@ class DbNotificationViewModel(application: Application) :
         return notificationDao.all()
     }
 
+    fun clearAll() {
+        notificationDao.deleteAll()
+    }
+
     /*
     class Factory(private val mApplication: Application) :
         ViewModelProvider.NewInstanceFactory() {
