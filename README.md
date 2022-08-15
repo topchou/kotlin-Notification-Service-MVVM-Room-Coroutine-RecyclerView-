@@ -1,1 +1,3 @@
-# kotlin-collect-notification
+# Structure
+
+![classDiagram](./classDiagram.png)
