@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.lifecycle.coroutineScope
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: NotificationAdapter
     private var notifyID = 0
     private var file: File? = null
+    private val mainScope = MainScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         binding.notificationList.adapter = adapter
         binding.notificationList.layoutManager = LinearLayoutManager(this)
 
-        lifecycle.coroutineScope.launch {
+        mainScope.launch {
             viewModel.notifications().collect {
                 Log.d(TAG, "Roro, notifications onChange")
                 adapter.setListData(it)
@@ -229,7 +231,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun exportToLocal() {
-        lifecycle.coroutineScope.launch {
+        mainScope.launch {
             Log.d(TAG, "Roro launch exportToLocal")
             val calendar = Calendar.getInstance()
             val dateFormat = SimpleDateFormat("MMdd_hhmmss")
@@ -238,7 +240,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Roro getPath: ${file?.path},  getAbsolutePath: ${file?.absolutePath}")
             var fos: FileOutputStream
             val split = "----------------------\n\n"
-            var list = viewModel.notifications().flattenToList()
+            var list = viewModel.notifications().first()
             Log.d(TAG, "Roro list size = ${list.size}")
             try {
                 fos = FileOutputStream(file)
@@ -264,7 +266,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    private suspend fun <T> Flow<List<T>>.flattenToList() =
-        flatMapConcat { it.asFlow() }.toList()
 }
